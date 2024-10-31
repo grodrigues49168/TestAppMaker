@@ -1,39 +1,108 @@
-// screens/HomeScreen.js
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+// screens/CadastroScreen.js
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function HomeScreen() {
+const CadastroScreen = ({ navigation }) => {
+  const [nomeCompleto, setNomeCompleto] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [senhaAdmin, setSenhaAdmin] = useState('');
+
+  const handleCadastro = () => {
+    // Lógica de cadastro aqui
+    console.log('Usuário cadastrado:', { nomeCompleto, email, senha, senhaAdmin });
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.shadowBox}>
-        <Text style={styles.text}>Bem-vindo à Tela Home</Text>
+    <LinearGradient colors={['#39f362', '#81d4a1', '#4db6ac', '#3e82bd']} style={styles.container}>
+      <View style={styles.mainView}>
+        <Text style={styles.title}>Cadastro de Novos Usuários</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome Completo"
+          placeholderTextColor="#999"
+          value={nomeCompleto}
+          onChangeText={setNomeCompleto}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#999"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha do Administrador"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={senhaAdmin}
+          onChangeText={setSenhaAdmin}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
   },
-  shadowBox: {
-    width: 300,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+  mainView: {
+    backgroundColor: 'white',
+    width: '90%',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
     elevation: 5,
-    borderRadius: 10,
+    alignItems: 'center',
   },
-  text: {
-    fontSize: 18,
-    color: '#333',
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: 'black',
+  },
+  input: {
+    width: '100%',
+    padding: 12,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    backgroundColor: '#f8f8f8',
+  },
+  button: {
+    backgroundColor: '#1e90ff',
+    padding: 15,
+    borderRadius: 20,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
+
+export default CadastroScreen;
+

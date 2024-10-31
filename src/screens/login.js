@@ -1,22 +1,23 @@
 // screens/LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Aqui você pode adicionar a lógica de validação do login
-    console.log('Email:', email, 'Password:', password);
-    // Navegar para a tela Home após o login
-    navigation.navigate('Main');
+    setIsLoggedIn(true);
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#333333', '#000000']} style={styles.container}>
       <View style={styles.mainView}>
-        <Text style={styles.logo}>explo | POTIMAKER</Text>
+        <View style={styles.logoContainer}>
+          <Image source={require('../../assets/logoPotimaker1.png')} style={styles.logoImage} />
+          <Text style={styles.logoText}>| POTIMAKER</Text>
+        </View>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -36,50 +37,56 @@ const LoginScreen = () => {
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black', // Fundo preto
     justifyContent: 'center',
     alignItems: 'center',
   },
   mainView: {
     backgroundColor: 'white',
-    width: '80%',
-    padding: 20,
-    borderRadius: 10,
+    width: '85%',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    borderRadius: 15,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5,
     alignItems: 'center',
   },
-  logo: {
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logoImage: {
+    width: 40,
+    height: 40,
+    marginRight: 8,
+  },
+  logoText: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
   },
   input: {
     width: '100%',
-    padding: 10,
+    padding: 12,
     marginVertical: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 10,  // Arredondamento dos inputs
     backgroundColor: '#f8f8f8',
   },
   button: {
-    backgroundColor: '#6a0dad', // Tom roxo
+    backgroundColor: '#6a0dad',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 20,  // Arredondamento dos botões
     width: '100%',
     alignItems: 'center',
     marginTop: 10,
