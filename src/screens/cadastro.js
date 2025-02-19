@@ -1,17 +1,42 @@
-// screens/CadastroScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { auth, database } from '../../config/firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { ref, set } from 'firebase/database';
 
 const CadastroScreen = ({ navigation }) => {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [senhaAdmin, setSenhaAdmin] = useState('');
+  const [id, setId] = useState('');
 
   const handleCadastro = () => {
-    // Lógica de cadastro aqui
-    console.log('Usuário cadastrado:', { nomeCompleto, email, senha, senhaAdmin });
+    if (!nomeCompleto || !email || !senha || !senhaAdmin || !id) {
+      Alert.alert('Erro', 'Todos os campos são obrigatórios!');
+      return;
+    }
+
+    if (senhaAdmin !== 'potimaker1') {
+      Alert.alert('Erro', 'A senha do administrador!');
+      return;
+    }
+    
+    createUserWithEmailAndPassword(auth, email, senha)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        set(ref(database, `/${id}`), {
+          nome: nomeCompleto,
+          email: email, // Enviando o email para o banco de dados
+          id: id,
+        });
+        Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
+        navigation.navigate('Home');
+      })
+      .catch((error) => {
+        Alert.alert('Erro', error.message);
+      });
   };
 
   return (
@@ -39,6 +64,13 @@ const CadastroScreen = ({ navigation }) => {
           secureTextEntry
           value={senha}
           onChangeText={setSenha}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Id"
+          placeholderTextColor="#999"
+          value={id}
+          onChangeText={setId}
         />
         <TextInput
           style={styles.input}
@@ -105,4 +137,3 @@ const styles = StyleSheet.create({
 });
 
 export default CadastroScreen;
-
