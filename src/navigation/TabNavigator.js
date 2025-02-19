@@ -6,6 +6,7 @@ import HomeScreen from '../screens/Home';
 import CadastroScreen from '../screens/cadastro';
 import HistoricoScreen from '../screens/historico';
 import SobreScreen from '../screens/sobre';
+import CadastroBiometria from '../screens/cadastroBiometria'
 
 const Drawer = createDrawerNavigator();
 
@@ -29,6 +30,13 @@ export default function DrawerNavigator() {
       <Drawer.Screen 
         name="Cadastro" 
         component={CadastroScreen} 
+        options={{
+          drawerIcon: ({ color, size }) => <Ionicons name="person-add-outline" size={size} color={color} />,
+        }}
+      />
+      <Drawer.Screen 
+        name="Cadastro Biometria" 
+        component={CadastroBiometria} 
         options={{
           drawerIcon: ({ color, size }) => <Ionicons name="person-add-outline" size={size} color={color} />,
         }}
