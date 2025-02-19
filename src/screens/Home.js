@@ -3,18 +3,23 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getDatabase, ref, set } from 'firebase/database';
 
 export default function HomeScreen() {
   const [isLocked, setIsLocked] = useState(true);
   const navigation = useNavigation();
+  const db = getDatabase();
 
   const toggleLock = () => {
-    setIsLocked(!isLocked);
+    if (isLocked) {
+      // Destravar a porta e enviar "on" para o Firebase
+      setIsLocked(false);
+      set(ref(db, 'porta'), 'on');
 
-    // Revert to locked state after 10 seconds
-    if (!isLocked) {
+      // Após 10 segundos, trancar a porta e enviar "off"
       setTimeout(() => {
         setIsLocked(true);
+        set(ref(db, 'porta'), 'off');
       }, 10000);
     }
   };

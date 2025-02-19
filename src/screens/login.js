@@ -1,14 +1,64 @@
 // screens/LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getDatabase, ref, update, get, child } from 'firebase/database';
+import { format } from 'date-fns';
 
 const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    const auth = getAuth();
+    const db = getDatabase();
+
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos!');
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        const user = userCredential.user;
+        const userUid = user.uid;
+        const currentDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+        // Buscar a lista de usuários no Firebase
+        const usersRef = ref(db, '/users');
+        const snapshot = await get(usersRef);
+
+        if (snapshot.exists()) {
+          let userKey = null;
+
+          snapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            if (userData.email === email) {
+              userKey = childSnapshot.key; // Obtém a chave correta
+            }
+          });
+
+          if (userKey) {
+            // Atualiza o lastLogin na referência correta
+            await update(ref(db, `/users/${userKey}`), {
+              ultimoAcessoPeloApp: currentDate,
+            });
+
+            console.log('Data e hora atualizadas com sucesso!');
+            setIsLoggedIn(true);
+            navigation.navigate('Home');
+          } else {
+            Alert.alert('Erro', 'Usuário não encontrado no banco de dados!');
+          }
+        } else {
+          Alert.alert('Erro', 'Nenhum usuário cadastrado!');
+        }
+      })
+      .catch((error) => {
+        console.error('Erro de login:', error.message);
+        Alert.alert('Erro', 'Credenciais inválidas!');
+      });
   };
 
   return (
@@ -80,13 +130,13 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10,  // Arredondamento dos inputs
+    borderRadius: 10,
     backgroundColor: '#f8f8f8',
   },
   button: {
     backgroundColor: '#6a0dad',
     padding: 15,
-    borderRadius: 20,  // Arredondamento dos botões
+    borderRadius: 20,
     width: '100%',
     alignItems: 'center',
     marginTop: 10,

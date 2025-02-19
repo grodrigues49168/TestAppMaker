@@ -26,13 +26,19 @@ const CadastroScreen = ({ navigation }) => {
     createUserWithEmailAndPassword(auth, email, senha)
       .then((userCredential) => {
         const user = userCredential.user;
-        set(ref(database, `/${id}`), {
+        // Altere aqui o caminho para garantir que o dado vá para /users/{id}
+        set(ref(database, `users/${id}`), {
           nome: nomeCompleto,
-          email: email, // Enviando o email para o banco de dados
+          email: email,
           id: id,
+        })
+        .then(() => {
+          Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
+          navigation.navigate('Home');
+        })
+        .catch((error) => {
+          Alert.alert('Erro', 'Erro ao salvar os dados: ' + error.message);
         });
-        Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
-        navigation.navigate('Home');
       })
       .catch((error) => {
         Alert.alert('Erro', error.message);
