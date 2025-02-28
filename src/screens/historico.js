@@ -54,6 +54,9 @@ const HistoricoScreen = () => {
               <Text style={styles.label}>
                 Último Acesso: <Text style={styles.value}>{formatDateTime(item.ultimoAcessoPeloApp)}</Text>
               </Text>
+              <Text style={styles.label}>
+                Último Acesso: <Text style={styles.value}>{formatDateTime(item.ultimoAcessoBiometria)}</Text>
+              </Text>
             </View>
           )}
         />

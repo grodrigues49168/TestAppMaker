@@ -1,30 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { database } from '../../config/firebaseConfig';
-import { ref, set } from 'firebase/database';
+import Paho from 'paho-mqtt';
+
+const client = new Paho.Client('10.44.1.35', 9001, '/');
 
 const CadastrarBiometriaScreen = ({ navigation }) => {
   const [id, setId] = useState(''); // Estado para armazenar o ID
+  const [isConnected, setIsConnected] = useState(false); // Estado para verificar a conexão
 
-  const handleCadastrarBiometria = async () => {
+  useEffect(() => {
+    // Função para conectar ao broker MQTT
+    const connectToMqtt = () => {
+      client.connect({
+        onSuccess: () => {
+          console.log('Conectado ao broker MQTT');
+          setIsConnected(true); // Atualiza o estado para conectado
+        },
+        onFailure: (err) => {
+          console.error('Falha ao conectar ao broker MQTT:', err);
+          Alert.alert('Erro', 'Falha ao conectar ao broker MQTT');
+        },
+      });
+    };
+
+    connectToMqtt();
+
+    // Desconectar ao sair da tela
+    return () => {
+      if (isConnected) {
+        client.disconnect();
+        console.log('Desconectado do broker MQTT');
+      }
+    };
+  }, []);
+
+  const handleCadastrarBiometria = () => {
     if (!id) {
       Alert.alert('Erro', 'O campo ID é obrigatório!');
       return;
     }
 
-    try {
-      // Ativa o modo de cadastro no Firebase
-      await set(ref(database, `cadastroBiometria/${id}`), {
-        cadastrar: true, // Ativa o modo de cadastro
-      });
+    if (!isConnected) {
+      Alert.alert('Erro', 'Não conectado ao broker MQTT');
+      return;
+    }
+
+    // Envia o ID para o tópico 'acesso/id'
+    const messageId = new Paho.Message(id);
+    messageId.destinationName = 'acesso/id';
+    client.send(messageId);
+
+    // Envia 'on' para o tópico 'acesso/cadastro'
+    const messageOn = new Paho.Message('ok');
+    messageOn.destinationName = 'acesso/cadastro';
+    client.send(messageOn);
+
+    // Após 2 segundos, envia 'off' para o tópico 'acesso/cadastro'
+    setTimeout(() => {
+      const messageOff = new Paho.Message('no');
+      messageOff.destinationName = 'acesso/cadastro';
+      client.send(messageOff);
 
       Alert.alert('Sucesso', 'Modo de cadastro de biometria ativado!');
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error('Erro ao ativar o modo de cadastro:', error);
-      Alert.alert('Erro', error.message);
-    }
+  
+    });
   };
 
   return (
